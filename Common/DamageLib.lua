@@ -30,8 +30,7 @@ local DamageReductionTablePlain = {
   ["Sona"] = {buff = "sonawshield", amount = function(target) return (25+(target:GetSpellData(_W).level-1)*25+target.ap*0.3) end},
   ["Udyr"] = {buff = "udyrturtleactivation", amount = function(target) return (60+(target:GetSpellData(_W).level-1)*35+target.ap*0.5) end},
   ["Victor"] = {buff = "victorpowertransfer", amount = function(target) return (23+(target.levelData.lvl-1)*4+target.ap*0.16) end},
-  ["Vi"] = {buff = "viwproc", amount = function(target) return (target.maxHealth*0.1) end},
-  ["Warwick"] = {buff = "warwicke", amount = function(target) return  end}
+  ["Vi"] = {buff = "viwproc", amount = function(target) return (target.maxHealth*0.1) end}
 }
 
 function GetPercentHP(unit)
@@ -132,7 +131,7 @@ function DamageReductionMod(source,target,amount,DamageType)
   end
 
   if target.type == Obj_AI_Hero then
-
+  
 	for i = 0, myHero.buffCount do
       if myHero:GetBuff(i).count > 0 then
         local buff = myHero:GetBuff(i)	    		
@@ -144,13 +143,13 @@ function DamageReductionMod(source,target,amount,DamageType)
       if target:GetBuff(i).count > 0 then
         local buff = target:GetBuff(i)
 		    
-	    if DamageReductionTablePlain[target.charName] then
-          if buff.name:lower() == DamageReductionTablePlain[target.charName].buff:lower() and (not DamageReductionTablePlain[target.charName].damagetype or DamageReductionTablePlain[target.charName].damagetype == DamageType) then
+	    if target and DamageReductionTablePlain[target.charName] then
+          if buff.name:lower() == DamageReductionTablePlain[target.charName].buff:lower() and (not DamageReductionTablePlain[target.charName].damagetype or DamageReductionTablePlain[target.charName].damagetype == DamageType) and amount > 0 then
             amount = amount - DamageReductionTablePlain[target.charName].amount(target)
           end
         end
 	
-		if DamageReductionTableMod[target.charName] then
+		if target and DamageReductionTableMod[target.charName] then
           if buff.name:lower() == DamageReductionTableMod[target.charName].buff:lower() and (not DamageReductionTableMod[target.charName].damagetype or DamageReductionTableMod[target.charName].damagetype == DamageType) then
             amount = amount * DamageReductionTableMod[target.charName].amount(target)
           end
