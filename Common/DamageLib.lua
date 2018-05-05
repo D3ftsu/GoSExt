@@ -247,7 +247,7 @@ function PassivePercentMod(source, target, amount, damageType)
   if source.type == Obj_AI_Hero then 
     if target.type == Obj_AI_Hero then
       if (GetItemSlot(source, 3036) > 0 or GetItemSlot(source, 3034) > 0) and source.maxHealth < target.maxHealth and damageType == 1 then
-        amount = amount * (1 + math.min(target.maxHealth - source.maxHealth, 500) / 50 * (GetItemSlot(source, 3036) > 0 and 0.015 or 0.01))
+        amount = amount * (1 + math.min(target.maxHealth - source.maxHealth, 2000) / 200 * (GetItemSlot(source, 3036) > 0 and 0.02 or 0.01))
       end
     end
   end
