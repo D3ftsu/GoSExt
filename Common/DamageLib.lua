@@ -158,6 +158,12 @@ function DamageReductionMod(source,target,amount,DamageType)
 		
 		amount = GeneralBuffDmgMod(amount, buff, target, DamageType)
 		
+		if target.charName == "MasterYi" then
+          if buff.name == "Meditate" then
+            return amount - amount * ({0.5, 0.55, 0.6, 0.65, 0.7})[target:GetSpellData(_W).level] / (source.type == Obj_AI_Turret and 2 or 1)
+          end
+        end
+		
       end
     end
 	
@@ -224,13 +230,7 @@ function GeneralBuffDmgMod(amount, buff, target, DamageType)
 		if buff.name:lower() == "sionwshieldstacks" then
 			return amount-buff.count
 		end
-		
-        if target.charName == "MasterYi" then
-          if buff.name == "Meditate" then
-            return amount - amount * ({0.5, 0.55, 0.6, 0.65, 0.7})[target:GetSpellData(_W).level] / (source.type == Obj_AI_Turret and 2 or 1)
-          end
-        end
-			
+					
 	return amount
 end
 
