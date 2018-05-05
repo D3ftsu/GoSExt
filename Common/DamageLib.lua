@@ -6,16 +6,36 @@ params:
 getdmg("SKILL",target,source,stagedmg,spelllvl)
 ]]
 
-local DamageReductionTable = {
+local DamageReductionTableMod = {
   ["Braum"] = {buff = "BraumShieldRaise", amount = function(target) return 1 - ({0.3, 0.325, 0.35, 0.375, 0.4})[target:GetSpellData(_E).level] end},
   ["Urgot"] = {buff = "urgotswapdef", amount = function(target) return 1 - ({0.3, 0.4, 0.5})[target:GetSpellData(_R).level] end},
-  ["Alistar"] = {buff = "Ferocious Howl", amount = function(target) return ({0.5, 0.4, 0.3})[target:GetSpellData(_R).level] end},
-  ["Amumu"] = {buff = "Tantrum", amount = function(target) return ({2, 4, 6, 8, 10})[target:GetSpellData(_E).level] end, damageType = 1},
+  ["Alistar"] = {buff = "FerociousHowl", amount = function(target) return ({0.5, 0.4, 0.3})[target:GetSpellData(_R).level] end},
   ["Galio"] = {buff = "GalioIdolOfDurand", amount = function(target) return 0.5 end},
   ["Garen"] = {buff = "GarenW", amount = function(target) return 0.7 end},
   ["Gragas"] = {buff = "GragasWSelf", amount = function(target) return ({0.1, 0.12, 0.14, 0.16, 0.18})[target:GetSpellData(_W).level] end},
   ["Annie"] = {buff = "MoltenShield", amount = function(target) return 1 - ({0.16,0.22,0.28,0.34,0.4})[target:GetSpellData(_E).level] end},
   ["Malzahar"] = {buff = "malzaharpassiveshield", amount = function(target) return 0.1 end}
+  ["Warwick"] = {buff = "warwicke", amount = function(target) return (1-(0.35+(target:GetSpellData(_E).level-1)*0.05)) end}
+  ["Shen"] = {buff = "taunt", amount = function(target) return 0.5 end}
+  ["Rammus"] = {buff = "taunt", amount = function(target) return 0.5 end}
+  ["Lissandra"] = {buff = "lissandrarself", amount = function(target) return 0 end}
+  ["Tryndamere"] = {buff = "undyingrage", amount = function(target) return 0 end}
+  ["Malzahar"] = {buff = "malzaharpassiveshield", amount = function(target) return 0.1 end}
+}
+
+local DamageReductionTablePlain = {
+  ["Amumu"] = {buff = "Tantrum", amount = function(target) return ({2, 4, 6, 8, 10})[target:GetSpellData(_E).level] end, damageType = 1},
+  ["Diana"] = {buff = "dianashield", amount = function(target) return (40+(target:GetSpellData(_W).level-1)*15+target.ap*0.3) end},
+  ["Riven"] = {buff = "rivenfeint", amount = function(target) return (95+(target:GetSpellData(_E).level-1)*30+target.bonusDamage) end},
+  ["Ryze"] = {buff = "ryzeqshield", amount = function(target) return (90+(target:GetSpellData(_Q).level-1)*30+target.ap*0.6+(target.maxMana-800)*0.03) end},
+  ["Sona"] = {buff = "sonawshield", amount = function(target) return (25+(target:GetSpellData(_W).level-1)*25+target.ap*0.3) end},
+  ["Udyr"] = {buff = "udyrturtleactivation", amount = function(target) return (60+(target:GetSpellData(_W).level-1)*35+target.ap*0.5) end},
+  ["Victor"] = {buff = "victorpowertransfer", amount = function(target) return (23+(target.levelData.lvl-1)*4+target.ap*0.16) end},
+  ["Vi"] = {buff = "viwproc", amount = function(target) return (target.maxHealth*0.1) end},
+  ["Warwick"] = {buff = "warwicke", amount = function(target) return  end},
+  ["Ryze"] = {buff = "ryzeqshield", amount = function(target) return  end},
+  ["Ryze"] = {buff = "ryzeqshield", amount = function(target) return  end},
+  ["Ryze"] = {buff = "ryzeqshield", amount = function(target) return  end},
 }
 
 function GetPercentHP(unit)
@@ -93,7 +113,7 @@ function CalcPhysicalDamage(source, target, amount)
   elseif (armor * ArmorPenPercent) - (bonusArmor * (1 - BonusArmorPen)) - ArmorPenFlat < 0 then
     value = 1
   end
-  return math.max(0, math.floor(DamageReductionMod(source, target, PassivePercentMod(source, target, value) * amount, 1)))
+  return math.max(0, math.floor(DamageReductionMod(source, target, PassivePercentMod(source, target, value, 1) * amount, 1)))
 end
 
 function CalcMagicalDamage(source, target, amount)
@@ -117,36 +137,34 @@ function DamageReductionMod(source,target,amount,DamageType)
 
   if target.type == Obj_AI_Hero then
 
+	for i = 0, myHero.buffCount do
+      if myHero:GetBuff(i).count > 0 then
+        local buff = myHero:GetBuff(i)	    		
+		amount = MyHeroBuffDmgMod(amount, buff, DamageType)
+      end
+    end
+	
     for i = 0, target.buffCount do
       if target:GetBuff(i).count > 0 then
         local buff = target:GetBuff(i)
-        if buff.name == "MasteryWardenOfTheDawn" then
-          amount = amount * (1 - (0.06 * buff.count))
-        end
-    
-        if DamageReductionTable[target.charName] then
-          if buff.name == DamageReductionTable[target.charName].buff and (not DamageReductionTable[target.charName].damagetype or DamageReductionTable[target.charName].damagetype == DamageType) then
-            amount = amount * DamageReductionTable[target.charName].amount(target)
+		    
+	    if DamageReductionTablePlain[target.charName] then
+          if buff.name:lower() == DamageReductionTablePlain[target.charName].buff:lower() and (not DamageReductionTablePlain[target.charName].damagetype or DamageReductionTablePlain[target.charName].damagetype == DamageType) then
+            amount = amount - DamageReductionTablePlain[target.charName].amount(target)
           end
         end
-
-        if target.charName == "Maokai" and source.type ~= Obj_AI_Turret then
-          if buff.name == "MaokaiDrainDefense" then
-            amount = amount * 0.8
+	
+		if DamageReductionTableMod[target.charName] then
+          if buff.name:lower() == DamageReductionTableMod[target.charName].buff:lower() and (not DamageReductionTableMod[target.charName].damagetype or DamageReductionTableMod[target.charName].damagetype == DamageType) then
+            amount = amount * DamageReductionTableMod[target.charName].amount(target)
           end
         end
-
-        if target.charName == "MasterYi" then
-          if buff.name == "Meditate" then
-            amount = amount - amount * ({0.5, 0.55, 0.6, 0.65, 0.7})[target:GetSpellData(_W).level] / (source.type == Obj_AI_Turret and 2 or 1)
-          end
-        end
+		
+		amount = GeneralBuffDmgMod(amount, buff, DamageType)
+		
       end
     end
-
-    if GetItemSlot(target, 1054) > 0 then
-      amount = amount - 8
-    end
+	
 
     if target.charName == "Kassadin" and DamageType == 2 then
       amount = amount * 0.85
@@ -154,6 +172,70 @@ function DamageReductionMod(source,target,amount,DamageType)
   end
 
   return amount
+end
+
+function MyHeroBuffDmgMod(amount, DamageType)
+
+	if buff.name:lower() == "itemsmitechallenge" then
+		return amount*0.8
+	end
+
+	if buff.name:lower() == "itemphantomdancerdebuff" then
+		return amount*0.88
+	end
+	
+	return amount
+end
+
+function GeneralBuffDmgMod(amount, DamageType)
+
+		if buff.name:lower() == "kindredrnodeathbuff" then
+			return 0
+		end
+			
+		if buff.name:lower() == "taricr" then
+			return 0
+		end
+	
+		if buff.type == 17 and buff.count > 0 then -- intervention etc
+			return 0
+		end
+	
+		if buff.type == 15 and buff.count > 0 then -- parry etc
+			return 0
+		end
+
+		if buff.type == 4 and buff.count > 0 then -- sivir spellshield etc
+			return 0
+		end
+		
+		if buff.type == 2 and buff.count > 1 then --  general shields
+			return amount-buff.count
+		end
+	
+        if buff.name == "MasteryWardenOfTheDawn" then
+          return amount * (1 - (0.06 * buff.count))
+        end
+		
+		if string.find(buff.name:lower(), "presstheattackdamag") then
+			return amount*(1.08  + (myHero.levelData.lvl-1)/18 * 0.04)
+		end
+	
+		if (string.find(buff.name:lower(), "boneplating.lua") or string.find(buff.name:lower(), "boneplatingcd.lua") and buff.duration == 0) and target.type == Obj_AI_Hero then
+			return amount - (20 + (target.levelData.lvl-1)/18 * 30)
+		end
+
+		if buff.name:lower() == "sionwshieldstacks" then
+			return amount-buff.count
+		end
+		
+        if target.charName == "MasterYi" then
+          if buff.name == "Meditate" then
+            return amount - amount * ({0.5, 0.55, 0.6, 0.65, 0.7})[target:GetSpellData(_W).level] / (source.type == Obj_AI_Turret and 2 or 1)
+          end
+        end
+			
+	return amount
 end
 
 function PassivePercentMod(source, target, amount, damageType)
