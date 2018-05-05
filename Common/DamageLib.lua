@@ -14,13 +14,12 @@ local DamageReductionTableMod = {
   ["Garen"] = {buff = "GarenW", amount = function(target) return 0.7 end},
   ["Gragas"] = {buff = "GragasWSelf", amount = function(target) return ({0.1, 0.12, 0.14, 0.16, 0.18})[target:GetSpellData(_W).level] end},
   ["Annie"] = {buff = "MoltenShield", amount = function(target) return 1 - ({0.16,0.22,0.28,0.34,0.4})[target:GetSpellData(_E).level] end},
-  ["Malzahar"] = {buff = "malzaharpassiveshield", amount = function(target) return 0.1 end}
-  ["Warwick"] = {buff = "warwicke", amount = function(target) return (1-(0.35+(target:GetSpellData(_E).level-1)*0.05)) end}
-  ["Shen"] = {buff = "taunt", amount = function(target) return 0.5 end}
-  ["Rammus"] = {buff = "taunt", amount = function(target) return 0.5 end}
-  ["Lissandra"] = {buff = "lissandrarself", amount = function(target) return 0 end}
+  ["Malzahar"] = {buff = "malzaharpassiveshield", amount = function(target) return 0.1 end},
+  ["Warwick"] = {buff = "warwicke", amount = function(target) return (1-(0.35+(target:GetSpellData(_E).level-1)*0.05)) end},
+  ["Shen"] = {buff = "taunt", amount = function(target) return 0.5 end},
+  ["Rammus"] = {buff = "taunt", amount = function(target) return 0.5 end},
+  ["Lissandra"] = {buff = "lissandrarself", amount = function(target) return 0 end},
   ["Tryndamere"] = {buff = "undyingrage", amount = function(target) return 0 end}
-  ["Malzahar"] = {buff = "malzaharpassiveshield", amount = function(target) return 0.1 end}
 }
 
 local DamageReductionTablePlain = {
@@ -32,10 +31,7 @@ local DamageReductionTablePlain = {
   ["Udyr"] = {buff = "udyrturtleactivation", amount = function(target) return (60+(target:GetSpellData(_W).level-1)*35+target.ap*0.5) end},
   ["Victor"] = {buff = "victorpowertransfer", amount = function(target) return (23+(target.levelData.lvl-1)*4+target.ap*0.16) end},
   ["Vi"] = {buff = "viwproc", amount = function(target) return (target.maxHealth*0.1) end},
-  ["Warwick"] = {buff = "warwicke", amount = function(target) return  end},
-  ["Ryze"] = {buff = "ryzeqshield", amount = function(target) return  end},
-  ["Ryze"] = {buff = "ryzeqshield", amount = function(target) return  end},
-  ["Ryze"] = {buff = "ryzeqshield", amount = function(target) return  end},
+  ["Warwick"] = {buff = "warwicke", amount = function(target) return  end}
 }
 
 function GetPercentHP(unit)
