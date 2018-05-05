@@ -170,7 +170,7 @@ function DamageReductionMod(source,target,amount,DamageType)
   return amount
 end
 
-function MyHeroBuffDmgMod(amount, DamageType)
+function MyHeroBuffDmgMod(amount, buff, DamageType)
 
 	if buff.name:lower() == "itemsmitechallenge" then
 		return amount*0.8
