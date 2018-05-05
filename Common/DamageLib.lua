@@ -71,6 +71,7 @@ function GetBuffData(unit, buffname)
 end
 
 function CalcPhysicalDamage(source, target, amount)
+
   local ArmorPenPercent = source.armorPenPercent
   local ArmorPenFlat = (0.4 + target.levelData.lvl / 30) * source.armorPen
   local BonusArmorPen = source.bonusArmorPenPercent
@@ -108,6 +109,7 @@ function CalcPhysicalDamage(source, target, amount)
   elseif (armor * ArmorPenPercent) - (bonusArmor * (1 - BonusArmorPen)) - ArmorPenFlat < 0 then
     value = 1
   end
+
   return math.max(0, math.floor(DamageReductionMod(source, target, PassivePercentMod(source, target, value, 1) * amount, 1)))
 end
 
@@ -124,21 +126,17 @@ function CalcMagicalDamage(source, target, amount)
 end
 
 function DamageReductionMod(source,target,amount,DamageType)
-  if source.type == Obj_AI_Hero then
-    if GotBuff(source, "Exhaust") > 0 then
-      amount = amount * 0.6
-    end
-  end
 
-  if target.type == Obj_AI_Hero then
-  
+  if source.type == Obj_AI_Hero then
 	for i = 0, myHero.buffCount do
       if myHero:GetBuff(i).count > 0 then
         local buff = myHero:GetBuff(i)	    		
-		amount = MyHeroBuffDmgMod(amount, buff, DamageType)
+		amount = MyHeroBuffDmgMod(amount, buff, DamageType)	
       end
     end
-	
+  end
+
+  if target.type == Obj_AI_Hero then	
     for i = 0, target.buffCount do
       if target:GetBuff(i).count > 0 then
         local buff = target:GetBuff(i)
@@ -176,6 +174,10 @@ function DamageReductionMod(source,target,amount,DamageType)
 end
 
 function MyHeroBuffDmgMod(amount, buff, DamageType)
+
+	if buff.name:lower() == "summonerexhaustdebuff" then
+		return amount*0.6
+	end
 
 	if buff.name:lower() == "itemsmitechallenge" then
 		return amount*0.8
@@ -236,7 +238,7 @@ end
 function PassivePercentMod(source, target, amount, damageType)
   local SiegeMinionList = {"Red_Minion_MechCannon", "Blue_Minion_MechCannon"}
   local NormalMinionList = {"Red_Minion_Wizard", "Blue_Minion_Wizard", "Red_Minion_Basic", "Blue_Minion_Basic"}
-
+  
   if source.type == Obj_AI_Turret then
     if table.contains(SiegeMinionList, target.charName) then
       amount = amount * 0.7
