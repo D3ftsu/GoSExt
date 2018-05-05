@@ -156,7 +156,7 @@ function DamageReductionMod(source,target,amount,DamageType)
           end
         end
 		
-		amount = GeneralBuffDmgMod(amount, buff, DamageType)
+		amount = GeneralBuffDmgMod(amount, buff, target, DamageType)
 		
       end
     end
@@ -183,7 +183,7 @@ function MyHeroBuffDmgMod(amount, buff, DamageType)
 	return amount
 end
 
-function GeneralBuffDmgMod(amount, DamageType)
+function GeneralBuffDmgMod(amount, buff, target, DamageType)
 
 		if buff.name:lower() == "kindredrnodeathbuff" then
 			return 0
